@@ -15,7 +15,8 @@ Or build from source:
 ```sh
 git clone https://github.com/forlornfern/ffisow
 cd ffisow
-go build -o ffisow .
+go build -o ffisow
+sudo mv ffisow /usr/local/bin/
 ```
 
 ## Usage
@@ -46,12 +47,3 @@ sudo ffisow ~/Downloads/archlinux.iso /dev/sdb
 # custom buffer size (8 MiB)
 sudo ffisow -b 8192 ~/Downloads/archlinux.iso /dev/sdb
 ```
-
-## Dependencies
-
-- [cobra](https://github.com/spf13/cobra)
-- [charm.land/log](https://charm.land/log)
-
-## License
-
-MIT
