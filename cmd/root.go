@@ -44,7 +44,9 @@ var (
 				Total:  size,
 			}
 
-			buf := make([]byte, 5*1024*1024)
+			bufSize, _ := cmd.Flags().GetInt64("buffer")
+
+			buf := make([]byte, max(4, bufSize)*1024)
 			_, err = io.CopyBuffer(dst, pr, buf)
 			if err != nil {
 				return err
@@ -56,6 +58,7 @@ var (
 
 func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose log")
+	rootCmd.Flags().Int64P("buffer", "b", 1024, "buffer size in KiB")
 }
 
 func Execute() {
