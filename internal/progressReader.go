@@ -21,7 +21,7 @@ func (pr *ProgressReader) Read(p []byte) (int, error) {
 
 	fmt.Fprintf(os.Stderr, "\r%.1f%%  %d / %d MB", percent, mb, totalMb)
 
-	if pr.Written >= pr.Total {
+	if pr.Written >= pr.Total && err == io.EOF {
 		fmt.Fprintln(os.Stderr)
 	}
 	return n, err
