@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/forlornfern/ffisow/internal"
 	"github.com/spf13/cobra"
@@ -30,6 +32,12 @@ var (
 			}
 			defer src.Close()
 			defer dst.Close()
+			if mounted, err := isMounted(args[1]); err != nil {
+				return err
+			} else if mounted {
+				return fmt.Errorf("%q is mounted", args[1])
+			}
+
 			info, err := src.Stat()
 			if err != nil {
 				return err
@@ -62,4 +70,19 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func isMounted(device string) (bool, error) {
+	data, err := os.ReadFile("/proc/mounts")
+	if err != nil {
+		return false, err
+	}
+
+	for line := range strings.SplitSeq(string(data), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) > 0 && strings.HasPrefix(fields[0], device) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
