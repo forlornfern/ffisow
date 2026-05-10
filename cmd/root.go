@@ -4,22 +4,19 @@ import (
 	"io"
 	"os"
 
-	"charm.land/log/v2"
 	"github.com/forlornfern/ffisow/internal"
 	"github.com/spf13/cobra"
 )
 
 var (
-	logger  = log.NewWithOptions(os.Stderr, log.Options{Level: log.WarnLevel, ReportTimestamp: false})
 	rootCmd = &cobra.Command{
-		Use:           "ffisow <iso> <device>",
-		Short:         "write ISO-image to device",
-		Example:       "ffisow ~/Downloads/linux.iso /dev/sda1",
-		Args:          cobra.ExactArgs(2),
-		SilenceErrors: true,
+		Use:     "ffisow <iso> <device>",
+		Short:   "write ISO-image to device",
+		Example: "ffisow ~/Downloads/linux.iso /dev/sda1",
+		Args:    cobra.ExactArgs(2),
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if verbose, _ := cmd.PersistentFlags().GetBool("verbose"); verbose {
-				logger.SetLevel(log.InfoLevel)
+				//
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -63,6 +60,6 @@ func init() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		logger.Fatal(err)
+		os.Exit(1)
 	}
 }
