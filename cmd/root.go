@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/forlornfern/ffisow/internal"
@@ -60,10 +61,22 @@ var (
 				return nil
 			}
 
-			size := info.Size()
+			data, err := os.ReadFile(fmt.Sprintf("/sys/block/%s", filepath.Base(args[1])))
+			if err != nil {
+				return err
+			}
+			deviceSize, err := strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
+			if err != nil {
+				return err
+			}
+			isoSize := info.Size()
+			if isoSize > deviceSize*512 {
+				return fmt.Errorf("%q size is to large for this block device", args[0])
+			}
+
 			pr := &internal.ProgressReader{
 				Reader: src,
-				Total:  size,
+				Total:  isoSize,
 			}
 
 			bufSize, _ := cmd.Flags().GetInt64("buffer")
