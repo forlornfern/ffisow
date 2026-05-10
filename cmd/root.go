@@ -42,8 +42,16 @@ var (
 			if err != nil {
 				return err
 			}
-			size := info.Size()
 
+			fmt.Fprintf(os.Stderr, "All data on the %q will be overwritten\nAre you sure? [y/N] ", args[1])
+			var input string
+			fmt.Scanln(&input)
+			fmt.Fprintf(os.Stderr, "\033[2A\033[0J")
+			if strings.ToLower(input) != "y" {
+				return nil
+			}
+
+			size := info.Size()
 			pr := &internal.ProgressReader{
 				Reader: src,
 				Total:  size,
