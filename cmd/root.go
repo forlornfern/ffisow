@@ -14,7 +14,7 @@ var (
 	rootCmd = &cobra.Command{
 		Use:     "ffisow <iso> <device>",
 		Short:   "write ISO-image to device",
-		Example: "ffisow ~/Downloads/linux.iso /dev/sda1",
+		Example: "ffisow ~/Downloads/linux.iso /dev/sda",
 		Args:    cobra.ExactArgs(2),
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if verbose, _ := cmd.PersistentFlags().GetBool("verbose"); verbose {
