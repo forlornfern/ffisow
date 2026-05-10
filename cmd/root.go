@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/forlornfern/ffisow/internal"
@@ -32,6 +34,13 @@ var (
 			}
 			defer src.Close()
 			defer dst.Close()
+			if dirs, err := os.ReadDir("/sys/block"); err != nil {
+				return err
+			} else if !slices.ContainsFunc(dirs, func(dir os.DirEntry) bool {
+				return dir.Name() == filepath.Base(args[1])
+			}) {
+				return fmt.Errorf("%q is not a block device", args[1])
+			}
 			if mounted, err := isMounted(args[1]); err != nil {
 				return err
 			} else if mounted {
