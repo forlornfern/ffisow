@@ -42,10 +42,16 @@ var (
 			}) {
 				return fmt.Errorf("%q is not a block device", args[1])
 			}
-			if mounted, err := isMounted(args[1]); err != nil {
+			if data, err := os.ReadFile("/proc/mounts"); err != nil {
 				return err
-			} else if mounted {
-				return fmt.Errorf("%q is mounted", args[1])
+			} else {
+				lines := strings.Split(string(data), "\n")
+				if slices.ContainsFunc(lines, func(line string) bool {
+					fields := strings.Fields(line)
+					return len(fields) > 0 && strings.HasPrefix(fields[0], args[1])
+				}) {
+					return fmt.Errorf("%q is mounted", args[1])
+				}
 			}
 
 			info, err := src.Stat()
@@ -100,19 +106,4 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
-}
-
-func isMounted(device string) (bool, error) {
-	data, err := os.ReadFile("/proc/mounts")
-	if err != nil {
-		return false, err
-	}
-
-	for line := range strings.SplitSeq(string(data), "\n") {
-		fields := strings.Fields(line)
-		if len(fields) > 0 && strings.HasPrefix(fields[0], device) {
-			return true, nil
-		}
-	}
-	return false, nil
 }
