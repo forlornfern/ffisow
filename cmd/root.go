@@ -58,6 +58,18 @@ var (
 			if err != nil {
 				return err
 			}
+			isoSize := info.Size()
+			if data, err := os.ReadFile(fmt.Sprintf("/sys/block/%s/size", filepath.Base(args[1]))); err != nil {
+				return err
+			} else {
+				deviceSize, err := strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
+				if err != nil {
+					return err
+				}
+				if isoSize > deviceSize*512 {
+					return fmt.Errorf("%q size is to large for this block device", args[0])
+				}
+			}
 
 			fmt.Fprintf(os.Stderr, "All data on the %q will be overwritten\nAre you sure? [y/N] ", args[1])
 			var input string
@@ -65,19 +77,6 @@ var (
 			fmt.Fprintf(os.Stderr, "\033[2A\033[0J")
 			if strings.ToLower(input) != "y" {
 				return nil
-			}
-
-			data, err := os.ReadFile(fmt.Sprintf("/sys/block/%s/size", filepath.Base(args[1])))
-			if err != nil {
-				return err
-			}
-			deviceSize, err := strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
-			if err != nil {
-				return err
-			}
-			isoSize := info.Size()
-			if isoSize > deviceSize*512 {
-				return fmt.Errorf("%q size is to large for this block device", args[0])
 			}
 
 			pr := &internal.ProgressReader{
