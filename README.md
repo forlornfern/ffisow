@@ -4,6 +4,8 @@
 
 Terminal tool for writing ISO images to block devices (USB drives, etc).
 
+![](./docs/assets/demo.gif)
+
 ## Installation
 
 ```sh
